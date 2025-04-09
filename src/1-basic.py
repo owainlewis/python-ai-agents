@@ -1,8 +1,8 @@
 from pydantic_ai import Agent
-
 from pydantic_ai.models.openai import OpenAIModel
+from dotenv import load_dotenv
 
-# A basic hello world example
+load_dotenv()
 
 model = OpenAIModel("gpt-4o")
 
