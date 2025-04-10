@@ -3,3 +3,5 @@ python-dotenv
 jinja2
 ipykernel 
 promptly-ai
+google-adk
+httpx

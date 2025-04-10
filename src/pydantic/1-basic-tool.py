@@ -1,21 +1,46 @@
 from pydantic_ai import Agent
 from pydantic_ai.models.openai import OpenAIModel
 from dotenv import load_dotenv
+from typing import List
+import httpx
+import os
+from datetime import datetime
+from promptly_ai import PromptManager
 
 load_dotenv()
 
 model = OpenAIModel("gpt-4o")
 
-agent = Agent(
-    model,
-    system_prompt="You are a helpful assistant. Use the name_generator tool to generate a name.",
+system_prompt = PromptManager.render(
+    "prompts/system.j2", time=datetime.now().isoformat()
 )
+
+agent = Agent(model, system_prompt=system_prompt)
 
 
 @agent.tool_plain
-def name_generator(name: str) -> str:
-    """Generate a name from a given string."""
-    return name.upper()
+def search_google(query: str) -> List[str]:
+    """
+    Search the web for the given query and return the top results.
+
+    Args:
+        query: The query to search for.
+
+    Returns:
+        The top search results
+    """
+    print(f"Searching Google {query}")
+    api_key = os.getenv("SERPER_API_KEY")
+    assert api_key, "Please set API key for serper"
+    search_results = httpx.get(
+        f"https://google.serper.dev/search?apiKey={api_key}&q={query}"
+    ).json()
+
+    results = []
+    for item in search_results["organic"]:
+        results.append(f"Title: {item['title']}\nSnippet: {item['snippet']}")
+
+    return results
 
 
 def agent_loop():
