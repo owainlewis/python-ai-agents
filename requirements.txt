@@ -2,3 +2,4 @@ pydantic-ai
 python-dotenv
 jinja2
 ipykernel 
+promptly-ai
